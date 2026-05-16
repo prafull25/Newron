@@ -36,6 +36,12 @@ class AIConsumer(BaseConsumer):
         
         summary_text = await asyncio.to_thread(self.ai_engine.enrich_digest, batch)
         
+        if summary_text.startswith("AI Error:") or summary_text.startswith("AI Enrichment Disabled"):
+            print(f"Skipping notification for {topic} due to AI error: {summary_text}")
+            self.batches[topic] = []
+            self.last_flush = time.time()
+            return
+        
         combined_data = {
             "topic": topic,
             "source": "AI_Digest",

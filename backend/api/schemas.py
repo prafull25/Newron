@@ -45,6 +45,7 @@ class RecipientCreate(BaseModel):
 
 class RecipientUpdate(BaseModel):
     name: Optional[str] = None
+    telegram_chat_id: Optional[str] = None
     subscribed_topics: Optional[List[str]] = None
     receive_breaking: Optional[bool] = None
     receive_digest: Optional[bool] = None

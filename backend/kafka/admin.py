@@ -42,6 +42,16 @@ def create_topics() -> dict:
 
     return {"created": created, "already_exist": already_exist, "failed": failed}
 
+def create_single_topic(topic_name: str) -> bool:
+    admin = get_admin()
+    new_topic = NewTopic(topic_name, num_partitions=1, replication_factor=1)
+    results = admin.create_topics([new_topic])
+    try:
+        results[topic_name].result()
+        return True
+    except Exception:
+        return False
+
 
 def list_topics() -> list[dict]:
     admin = get_admin()

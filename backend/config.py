@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     clickhouse_db: str
     redis_url: str
     gemini_api_key: str = ""
+    groq_api_key: str = ""
     telegram_bot_token: str = ""
     newsapi_key: str = ""
     reddit_client_id: str = ""

@@ -7,8 +7,8 @@ class ClassifierConsumer(BaseConsumer):
     def __init__(self):
         # Subscribe to all raw news topics
         super().__init__(
-            group_id="classifier-group-v2",
-            topics=["news.raw.politics", "news.raw.markets", "news.raw.tech"]
+            group_id="classifier-group-v3",
+            topics=["^news\.raw\..*"]
         )
         self.producer = BaseProducer()
         self.classifier = Classifier()

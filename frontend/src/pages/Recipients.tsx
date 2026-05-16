@@ -98,7 +98,7 @@ export default function Recipients() {
               </div>
               <div className={styles.field}>
                 <label>Telegram Chat ID</label>
-                <input required placeholder="e.g. 123456789" value={form.telegram_chat_id} onChange={e => setForm(f => ({ ...f, telegram_chat_id: e.target.value }))} disabled={editingId !== null} />
+                <input required placeholder="e.g. 123456789" value={form.telegram_chat_id} onChange={e => setForm(f => ({ ...f, telegram_chat_id: e.target.value }))} />
               </div>
             </div>
             <div className={styles.field}>

@@ -40,12 +40,6 @@ class NotificationConsumer(BaseConsumer):
         ai_analysis = data.get("ai_analysis", "")
         priority = data.get("priority", "digest")
 
-        message = (
-            f"<b>{headline}</b>\n\n"
-            f"{ai_analysis}\n\n"
-            f"<a href='{url}'>Read more</a>"
-        )
-
         recipients = await self._get_recipients(topic_name)
 
         async with AsyncSessionLocal() as db:
@@ -54,6 +48,13 @@ class NotificationConsumer(BaseConsumer):
                     continue
                 if priority == "digest" and not recipient.receive_digest:
                     continue
+
+                display_topic = topic_name.replace('_', ' ').title()
+                message = (
+                    f"Hi {recipient.name}, here is News summary for {display_topic}:\n\n"
+                    f"{ai_analysis}\n\n"
+                    f"<a href='{url}'>Dashboard</a>"
+                )
 
                 print(f"Sending to {recipient.name} ({recipient.telegram_chat_id})")
                 success = await self.telegram.send_notification(

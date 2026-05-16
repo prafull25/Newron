@@ -19,10 +19,10 @@ frontend:
 # Start all Kafka consumers in the background
 consumers:
 	@echo "Starting consumers in the background..."
-	@cd backend && export PYTHONPATH=. && export PYTHONUNBUFFERED=1 && \
-	nohup python -m kafka.consumers.classifier_consumer > ../scratch/classifier.log 2>&1 & \
-	nohup python -m kafka.consumers.ai_consumer > ../scratch/ai.log 2>&1 & \
-	nohup python -m kafka.consumers.notification_consumer > ../scratch/notification.log 2>&1 &
+	@mkdir -p scratch
+	@cd backend && nohup ../venv/bin/python -m kafka.consumers.classifier_consumer > ../scratch/classifier.log 2>&1 &
+	@cd backend && nohup ../venv/bin/python -m kafka.consumers.ai_consumer > ../scratch/ai.log 2>&1 &
+	@cd backend && nohup ../venv/bin/python -m kafka.consumers.notification_consumer > ../scratch/notification.log 2>&1 &
 	@echo "Consumers started successfully. Logs are available in the 'scratch/' directory."
 
 # Stop all background Kafka consumers
@@ -34,9 +34,9 @@ stop-consumers:
 # Start everything in the background
 start-all: infra consumers
 	@echo "Starting backend in background..."
-	@cd backend && nohup uvicorn main:app --reload > ../scratch/backend.log 2>&1 &
+	@bash -c 'cd backend && nohup ../venv/bin/uvicorn main:app --reload > ../scratch/backend.log 2>&1 &'
 	@echo "Starting frontend in background..."
-	@cd frontend && nohup npm run dev > ../scratch/frontend.log 2>&1 &
+	@bash -c 'cd frontend && nohup npm run dev > ../scratch/frontend.log 2>&1 &'
 	@echo "All services started successfully!"
 	@echo "Frontend Dashboard: http://localhost:3000"
 	@echo "Backend API Docs: http://localhost:8000/docs"

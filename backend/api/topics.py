@@ -24,6 +24,8 @@ async def get_topic(name: str, db: AsyncSession = Depends(get_db)):
     return topic
 
 
+from kafka.admin import create_single_topic
+
 @router.post("", response_model=TopicResponse, status_code=201)
 async def create_topic(data: TopicCreate, db: AsyncSession = Depends(get_db)):
     existing = await db.execute(select(Topic).where(Topic.name == data.name))
@@ -33,6 +35,10 @@ async def create_topic(data: TopicCreate, db: AsyncSession = Depends(get_db)):
     db.add(topic)
     await db.commit()
     await db.refresh(topic)
+    
+    # Automatically provision the Kafka topic
+    create_single_topic(f"news.raw.{topic.name}")
+    
     return topic
 
 
