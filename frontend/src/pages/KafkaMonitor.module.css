@@ -1,0 +1,38 @@
+.page { padding: 2rem; max-width: 1200px; width: 100%; }
+.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; gap: 1rem; flex-wrap: wrap; }
+.title { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; }
+.subtitle { color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.25rem; }
+.headerActions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+
+.btnPrimary { display: flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1.125rem; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
+.btnPrimary:hover { opacity: 0.85; }
+.btnPrimary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btnGhost { display: flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1.125rem; background: transparent; color: var(--text-secondary); border: 1px solid var(--border); border-radius: 10px; font-size: 0.875rem; cursor: pointer; transition: border-color 0.15s; }
+.btnGhost:hover { border-color: var(--border-hover); color: var(--text-primary); }
+.btnGhost:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinning { animation: spin 1s linear infinite; }
+
+.metaRow { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.metaCard { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 1.125rem 1.25rem; display: flex; align-items: center; gap: 0.875rem; }
+.metaVal { font-size: 1.625rem; font-weight: 700; letter-spacing: -0.03em; }
+.metaLabel { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+
+.section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+.sectionTitle { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9375rem; font-weight: 600; margin-bottom: 1.25rem; }
+
+.brokerList { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.brokerChip { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 10px; border: 1px solid #22d3ee20; background: #22d3ee08; font-size: 0.8rem; color: var(--accent2); }
+.brokerId { font-weight: 700; font-family: monospace; }
+
+.topicTable { display: flex; flex-direction: column; gap: 0; }
+.tableHeader { display: grid; grid-template-columns: 1fr 90px 90px 90px; gap: 1rem; padding: 0.625rem 1rem; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+.tableRow { display: grid; grid-template-columns: 1fr 90px 90px 90px; gap: 1rem; padding: 0.875rem 1rem; font-size: 0.875rem; border-bottom: 1px solid var(--border); transition: background 0.15s; align-items: center; }
+.tableRow:last-child { border-bottom: none; }
+.tableRow:hover { background: var(--bg3); }
+.topicName { font-family: monospace; font-size: 0.8125rem; color: var(--text-primary); }
+.newronBadge { display: inline-block; padding: 0.15rem 0.625rem; border-radius: 999px; font-size: 0.73rem; background: #7c6af715; border: 1px solid var(--accent-glow); color: var(--accent); }
+.extBadge { display: inline-block; padding: 0.15rem 0.625rem; border-radius: 999px; font-size: 0.73rem; background: var(--bg3); border: 1px solid var(--border); color: var(--text-muted); }
+
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; color: var(--text-muted); padding: 4rem 2rem; }
