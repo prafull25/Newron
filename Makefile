@@ -31,11 +31,21 @@ stop-consumers:
 	pkill -f "python -m kafka.consumers" || true
 	@echo "Consumers stopped."
 
-# Start infra and consumers automatically
-run-all: infra consumers
-	@echo "Infrastructure and Consumers are running."
-	@echo "Next steps: Run 'make backend' and 'make frontend' in separate terminals."
+# Start everything in the background
+start-all: infra consumers
+	@echo "Starting backend in background..."
+	@cd backend && nohup uvicorn main:app --reload > ../scratch/backend.log 2>&1 &
+	@echo "Starting frontend in background..."
+	@cd frontend && nohup npm run dev > ../scratch/frontend.log 2>&1 &
+	@echo "All services started successfully!"
+	@echo "Frontend Dashboard: http://localhost:3000"
+	@echo "Backend API Docs: http://localhost:8000/docs"
+	@echo "Logs are available in the 'scratch/' directory."
 
 # Stop everything
 stop-all: stop-consumers stop-infra
+	@echo "Stopping backend..."
+	@pkill -f "uvicorn main:app" || true
+	@echo "Stopping frontend..."
+	@pkill -f "vite" || true
 	@echo "Everything has been shut down."
