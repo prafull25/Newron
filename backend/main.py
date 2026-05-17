@@ -4,13 +4,19 @@ from api.topics import router as topics_router
 from api.recipients import router as recipients_router
 from api.kafka_admin import router as kafka_router
 from api.feed import router as feed_router
+from api.analytics import router as analytics_router
 
 from contextlib import asynccontextmanager
 from scheduler.jobs import scheduler, sync_scheduler_with_db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Start scheduler
+    # Startup: initialize analytics tables, then start scheduler
+    try:
+        from services.analytics import ensure_tables
+        ensure_tables()
+    except Exception as e:
+        print(f"ClickHouse not ready on startup (will retry on first event): {e}")
     await sync_scheduler_with_db()
     scheduler.start()
     yield
@@ -31,6 +37,7 @@ app.include_router(topics_router)
 app.include_router(recipients_router)
 app.include_router(kafka_router)
 app.include_router(feed_router)
+app.include_router(analytics_router)
 
 
 @app.get("/health")

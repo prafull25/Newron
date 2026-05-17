@@ -1,6 +1,7 @@
 import asyncio
 from kafka.consumers.base_consumer import BaseConsumer
 from services.telegram_service import TelegramService
+from services import analytics
 from database import AsyncSessionLocal
 from models.postgres import Recipient, NotificationLog
 from sqlalchemy import select
@@ -50,10 +51,18 @@ class NotificationConsumer(BaseConsumer):
                     continue
 
                 display_topic = topic_name.replace('_', ' ').title()
+                article_urls = data.get("article_urls", [])
+                sources_block = ""
+                if article_urls:
+                    links = "\n".join(
+                        f'{i+1}. <a href="{u}">{u[:60]}...</a>' for i, u in enumerate(article_urls)
+                    )
+                    sources_block = f"\n\n📎 <b>Sources:</b>\n{links}"
+
                 message = (
                     f"Hi {recipient.name}, here is News summary for {display_topic}:\n\n"
-                    f"{ai_analysis}\n\n"
-                    f"<a href='{url}'>Dashboard</a>"
+                    f"{ai_analysis}"
+                    f"{sources_block}"
                 )
 
                 print(f"Sending to {recipient.name} ({recipient.telegram_chat_id})")
@@ -70,6 +79,14 @@ class NotificationConsumer(BaseConsumer):
                     status="sent" if success else "failed"
                 )
                 db.add(log)
+
+                # Track in ClickHouse for analytics
+                analytics.track_notification(
+                    topic=topic_name,
+                    recipient_id=recipient.id,
+                    alert_type=priority,
+                    status="sent" if success else "failed"
+                )
             
             await db.commit()
 

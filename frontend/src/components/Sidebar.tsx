@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Rss, Users, Zap, Newspaper } from 'lucide-react';
+import { LayoutDashboard, Rss, Users, Zap, Newspaper, BarChart2 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
 const nav = [
@@ -7,6 +7,7 @@ const nav = [
   { to: '/topics', icon: Rss, label: 'Topics' },
   { to: '/recipients', icon: Users, label: 'Recipients' },
   { to: '/kafka', icon: Zap, label: 'Kafka' },
+  { to: '/analytics', icon: BarChart2, label: 'Analytics' },
 ];
 
 export default function Sidebar() {

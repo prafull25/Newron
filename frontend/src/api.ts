@@ -29,3 +29,11 @@ export const feedApi = {
 export const healthApi = {
   check: () => api.get('/health'),
 };
+
+export const analyticsApi = {
+  overview: () => api.get('/analytics/overview'),
+  articlesByTopic: () => api.get('/analytics/articles-by-topic'),
+  articlesOverTime: () => api.get('/analytics/articles-over-time'),
+  notificationsByTopic: () => api.get('/analytics/notifications-by-topic'),
+  notificationsOverTime: () => api.get('/analytics/notifications-over-time'),
+};

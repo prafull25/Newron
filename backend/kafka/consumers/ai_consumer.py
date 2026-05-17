@@ -23,8 +23,10 @@ class AIConsumer(BaseConsumer):
             
         self.batches[topic].append(data)
         
-        # Flush if we have enough messages for this topic
-        if len(self.batches[topic]) >= 15 or (time.time() - self.last_flush > 10):
+        # Safety guard: If a batch reaches 50 articles, flush it immediately
+        # to prevent extremely large payloads. Otherwise, let it accumulate
+        # and we will flush the entire batch at once when the queue is empty.
+        if len(self.batches[topic]) >= 50:
             await self._flush_topic(topic)
 
     async def _flush_topic(self, topic: str):
@@ -42,6 +44,11 @@ class AIConsumer(BaseConsumer):
             self.last_flush = time.time()
             return
         
+        # Collect unique article URLs from the batch (max 5)
+        article_urls = list(dict.fromkeys(
+            a["url"] for a in batch if a.get("url")
+        ))[:5]
+
         combined_data = {
             "topic": topic,
             "source": "AI_Digest",
@@ -49,6 +56,7 @@ class AIConsumer(BaseConsumer):
             "url": "http://localhost:3000",
             "summary": f"Combined news batch for {topic}",
             "ai_analysis": summary_text,
+            "article_urls": article_urls,
             "published_at": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
         }
         
@@ -71,11 +79,11 @@ class AIConsumer(BaseConsumer):
                 msg = await asyncio.to_thread(self.consumer.poll, 1.0)
                 
                 if msg is None:
-                    # Flush any pending batches if timeout reached
-                    if time.time() - self.last_flush > 10:
-                        for topic in list(self.batches.keys()):
-                            await self._flush_topic(topic)
-                        self.last_flush = time.time()
+                    # No new messages received in the last 1.0s.
+                    # This means we have consumed the entire current backlog of scraped articles.
+                    # Flush all accumulated topic batches now to send exactly one consolidated digest per topic!
+                    for topic in list(self.batches.keys()):
+                        await self._flush_topic(topic)
                     continue
                     
                 if msg.error():

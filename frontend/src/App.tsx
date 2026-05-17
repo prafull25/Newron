@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Topics from './pages/Topics';
 import Recipients from './pages/Recipients';
 import KafkaMonitor from './pages/KafkaMonitor';
+import Analytics from './pages/Analytics';
 import './index.css';
 import styles from './App.module.css';
 
@@ -18,6 +19,7 @@ export default function App() {
             <Route path="/topics" element={<Topics />} />
             <Route path="/recipients" element={<Recipients />} />
             <Route path="/kafka" element={<KafkaMonitor />} />
+            <Route path="/analytics" element={<Analytics />} />
           </Routes>
         </main>
       </div>

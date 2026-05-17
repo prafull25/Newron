@@ -92,7 +92,9 @@ services:
     container_name: newron-redis
     ports:
       - "6379:6379"
-    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -126,3 +128,4 @@ services:
 volumes:
   postgres_data:
   clickhouse_data:
+  redis_data:

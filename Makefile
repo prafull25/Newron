@@ -20,9 +20,9 @@ frontend:
 consumers:
 	@echo "Starting consumers in the background..."
 	@mkdir -p scratch
-	@cd backend && nohup ../venv/bin/python -m kafka.consumers.classifier_consumer > ../scratch/classifier.log 2>&1 &
-	@cd backend && nohup ../venv/bin/python -m kafka.consumers.ai_consumer > ../scratch/ai.log 2>&1 &
-	@cd backend && nohup ../venv/bin/python -m kafka.consumers.notification_consumer > ../scratch/notification.log 2>&1 &
+	@cd backend && PYTHONUNBUFFERED=1 nohup ../venv/bin/python -m kafka.consumers.classifier_consumer > ../scratch/classifier.log 2>&1 &
+	@cd backend && PYTHONUNBUFFERED=1 nohup ../venv/bin/python -m kafka.consumers.ai_consumer > ../scratch/ai.log 2>&1 &
+	@cd backend && PYTHONUNBUFFERED=1 nohup ../venv/bin/python -m kafka.consumers.notification_consumer > ../scratch/notification.log 2>&1 &
 	@echo "Consumers started successfully. Logs are available in the 'scratch/' directory."
 
 # Stop all background Kafka consumers
@@ -32,9 +32,18 @@ stop-consumers:
 	@echo "Consumers stopped."
 
 # Start everything in the background
-start-all: infra consumers
+start-all: infra
 	@echo "Starting backend in background..."
-	@bash -c 'cd backend && nohup ../venv/bin/uvicorn main:app --reload > ../scratch/backend.log 2>&1 &'
+	@bash -c 'cd backend && PYTHONUNBUFFERED=1 nohup ../venv/bin/uvicorn main:app --reload > ../scratch/backend.log 2>&1 &'
+	@echo "Waiting for backend to be ready..."
+	@sleep 8
+	@echo "Provisioning Kafka topics..."
+	@curl -s -X POST http://localhost:8000/kafka/setup > /dev/null && echo "Kafka topics provisioned." || echo "Warning: Could not provision Kafka topics."
+	@echo "Starting consumers in the background..."
+	@mkdir -p scratch
+	@cd backend && PYTHONUNBUFFERED=1 nohup ../venv/bin/python -m kafka.consumers.classifier_consumer > ../scratch/classifier.log 2>&1 &
+	@cd backend && PYTHONUNBUFFERED=1 nohup ../venv/bin/python -m kafka.consumers.ai_consumer > ../scratch/ai.log 2>&1 &
+	@cd backend && PYTHONUNBUFFERED=1 nohup ../venv/bin/python -m kafka.consumers.notification_consumer > ../scratch/notification.log 2>&1 &
 	@echo "Starting frontend in background..."
 	@bash -c 'cd frontend && nohup npm run dev > ../scratch/frontend.log 2>&1 &'
 	@echo "All services started successfully!"

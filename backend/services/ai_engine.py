@@ -20,7 +20,7 @@ class AIEngine:
                 model="llama-3.3-70b-versatile",
                 messages=[{"role": "user", "content": full_prompt}],
                 temperature=0.7,
-                max_tokens=1000
+                max_tokens=400
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -32,7 +32,7 @@ class AIEngine:
         return self._call_ai(prompt, system)
 
     def enrich_digest(self, articles: list) -> str:
-        system = "You are an expert news curator. You have received a batch of news articles. Create a single, beautifully formatted markdown briefing summarizing the most important trends and stories from this batch. Use bullet points and group similar stories."
+        system = "You are an expert news curator. Write a very short plain-text news summary. Use ONLY '• ' as bullet points. DO NOT use any markdown: no ###, no **, no *, no backticks. Each bullet must be 1 sentence max. Include only the top 4-5 most important stories. Be punchy and direct."
         # Keep only the essential parts of the articles to avoid overwhelming the prompt token limit
         condensed_articles = [{"headline": a["headline"], "summary": a.get("summary", "")[:200]} for a in articles]
         prompt = json.dumps(condensed_articles)
