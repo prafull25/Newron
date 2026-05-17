@@ -2,6 +2,23 @@ import axios from 'axios';
 
 const api = axios.create({ baseURL: '/api' });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
+export const authApi = {
+  login: (data: any) => api.post('/auth/login', data),
+  signup: (data: any) => api.post('/auth/signup', data),
+  changePassword: (data: any) => api.post('/auth/change-password', data),
+  me: () => api.get('/auth/me'),
+};
+
 export const topicsApi = {
   list: () => api.get('/topics'),
   create: (data: any) => api.post('/topics', data),
