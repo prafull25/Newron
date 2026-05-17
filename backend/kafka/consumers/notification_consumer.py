@@ -19,20 +19,10 @@ class NotificationConsumer(BaseConsumer):
         await self.handle_notification(data)
 
     async def _get_recipients(self, topic_name: str):
-        import time
-        if not hasattr(self, '_rec_cache'):
-            self._rec_cache = {}
-            self._rec_cache_time = 0
-            
-        if time.time() - self._rec_cache_time > 300: # 5 min cache
-            async with AsyncSessionLocal() as db:
-                result = await db.execute(select(Recipient).where(Recipient.is_active == True))
-                all_rec = result.scalars().all()
-                self._rec_cache = all_rec
-                self._rec_cache_time = time.time()
-                
-        # Filter from cache
-        return [r for r in self._rec_cache if topic_name in r.subscribed_topics]
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(select(Recipient).where(Recipient.is_active == True))
+            active_recipients = result.scalars().all()
+            return [r for r in active_recipients if topic_name in r.subscribed_topics]
 
     async def handle_notification(self, data: dict):
         topic_name = data["topic"]
