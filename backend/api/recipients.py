@@ -24,20 +24,19 @@ async def get_my_recipient_config(
     result = await db.execute(select(Recipient).where(Recipient.user_id == current_user.id))
     recipient = result.scalar_one_or_none()
     
-    # If not found, create a placeholder config so the user can easily update it
+    # If not found, return an unsaved placeholder dict so we do not trigger unique constraint empty string crashes
     if not recipient:
-        recipient = Recipient(
-            name=current_user.username,
-            telegram_chat_id="",
-            subscribed_topics=[],
-            receive_breaking=True,
-            receive_digest=True,
-            is_active=True,
-            user_id=current_user.id
-        )
-        db.add(recipient)
-        await db.commit()
-        await db.refresh(recipient)
+        return {
+            "id": 0,
+            "name": current_user.username,
+            "telegram_chat_id": "",
+            "subscribed_topics": [],
+            "receive_breaking": True,
+            "receive_digest": True,
+            "is_active": True,
+            "user_id": current_user.id,
+            "created_at": None
+        }
         
     return recipient
 
@@ -49,14 +48,34 @@ async def update_my_recipient_config(
     db: AsyncSession = Depends(get_db)
 ):
     """Create or update the personal telegram recipient configuration of the logged-in user."""
+    # Enforce non-empty telegram chat id when creating/updating recipient config
+    if data.telegram_chat_id is not None and not data.telegram_chat_id.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Telegram Chat ID cannot be empty. Please enter a valid Telegram Chat ID."
+        )
+
     result = await db.execute(select(Recipient).where(Recipient.user_id == current_user.id))
     recipient = result.scalar_one_or_none()
     
     if not recipient:
-        # Fallback create
+        # Fallback create - validate chat ID is provided
+        if not data.telegram_chat_id or not data.telegram_chat_id.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Telegram Chat ID is required to register subscription alert configurations."
+            )
+            
+        # Verify uniqueness
+        existing = await db.execute(
+            select(Recipient).where(Recipient.telegram_chat_id == data.telegram_chat_id.strip())
+        )
+        if existing.scalar_one_or_none():
+            raise HTTPException(status_code=409, detail="Telegram chat ID already registered by another user")
+
         recipient = Recipient(
             name=current_user.username,
-            telegram_chat_id=data.telegram_chat_id or "",
+            telegram_chat_id=data.telegram_chat_id.strip(),
             subscribed_topics=data.subscribed_topics or [],
             receive_breaking=data.receive_breaking if data.receive_breaking is not None else True,
             receive_digest=data.receive_digest if data.receive_digest is not None else True,
@@ -69,14 +88,15 @@ async def update_my_recipient_config(
         if data.name is not None:
             recipient.name = data.name
         if data.telegram_chat_id is not None:
+            new_chat_id = data.telegram_chat_id.strip()
             # Check unique constraint if changing chat ID
-            if data.telegram_chat_id != recipient.telegram_chat_id and data.telegram_chat_id != "":
+            if new_chat_id != recipient.telegram_chat_id:
                 existing = await db.execute(
-                    select(Recipient).where(Recipient.telegram_chat_id == data.telegram_chat_id)
+                    select(Recipient).where(Recipient.telegram_chat_id == new_chat_id)
                 )
                 if existing.scalar_one_or_none():
                     raise HTTPException(status_code=409, detail="Telegram chat ID already registered by another user")
-            recipient.telegram_chat_id = data.telegram_chat_id
+            recipient.telegram_chat_id = new_chat_id
         if data.subscribed_topics is not None:
             recipient.subscribed_topics = data.subscribed_topics
         if data.receive_breaking is not None:
