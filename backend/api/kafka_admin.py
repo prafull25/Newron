@@ -5,7 +5,9 @@ from database import get_db
 from models.postgres import Topic
 from kafka.admin import create_topics, list_topics, get_topic_stats, create_single_topic
 
-router = APIRouter(prefix="/kafka", tags=["kafka"])
+from services.auth import require_superuser
+
+router = APIRouter(prefix="/kafka", tags=["kafka"], dependencies=[Depends(require_superuser)])
 
 
 @router.post("/setup")

@@ -5,7 +5,7 @@ import { authApi } from '../api';
 import styles from './Login.module.css';
 
 interface LoginProps {
-  onLoginSuccess: (token: string, username: string) => void;
+  onLoginSuccess: (token: string, username: string, isSuperuser: boolean) => void;
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
@@ -43,8 +43,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     } else {
       try {
         const res = await authApi.login({ username, password });
-        const { access_token, username: loggedUser } = res.data;
-        onLoginSuccess(access_token, loggedUser);
+        const { access_token, username: loggedUser, is_superuser } = res.data;
+        onLoginSuccess(access_token, loggedUser, is_superuser);
       } catch (err: any) {
         setError(err.response?.data?.detail || 'Invalid username or password');
       } finally {

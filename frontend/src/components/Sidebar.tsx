@@ -4,7 +4,7 @@ import { LayoutDashboard, Rss, Users, Zap, Newspaper, BarChart2, LogOut, Key, Al
 import { authApi } from '../api';
 import styles from './Sidebar.module.css';
 
-const nav = [
+const superuserNav = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/topics', icon: Rss, label: 'Topics' },
   { to: '/recipients', icon: Users, label: 'Recipients' },
@@ -12,12 +12,17 @@ const nav = [
   { to: '/analytics', icon: BarChart2, label: 'Analytics' },
 ];
 
+const subscriberNav = [
+  { to: '/', icon: Users, label: 'Alert Settings' },
+];
+
 interface SidebarProps {
   username: string;
+  isSuperuser: boolean;
   onLogout: () => void;
 }
 
-export default function Sidebar({ username, onLogout }: SidebarProps) {
+export default function Sidebar({ username, isSuperuser, onLogout }: SidebarProps) {
   const [showModal, setShowModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -62,7 +67,7 @@ export default function Sidebar({ username, onLogout }: SidebarProps) {
           <span className={styles.brandName}>Newron</span>
         </div>
         <nav className={styles.nav}>
-          {nav.map(({ to, icon: Icon, label }) => (
+          {(isSuperuser ? superuserNav : subscriberNav).map(({ to, icon: Icon, label }) => (
             <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}>
               <Icon size={18} />
               <span>{label}</span>

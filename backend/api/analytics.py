@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from clickhouse_driver import Client
 from config import settings
 import logging
+from services.auth import require_superuser
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/analytics", tags=["analytics"])
+router = APIRouter(prefix="/analytics", tags=["analytics"], dependencies=[Depends(require_superuser)])
 
 
 def get_ch() -> Client:

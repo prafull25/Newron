@@ -28,6 +28,7 @@ class Recipient(Base):
     receive_breaking = Column(Boolean, default=True)
     receive_digest = Column(Boolean, default=True)
     is_active = Column(Boolean, default=True)
+    user_id = Column(Integer, unique=True, nullable=True) # links to User.id
     created_at = Column(TIMESTAMP, server_default=func.now())
 
 

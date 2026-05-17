@@ -31,6 +31,8 @@ export const recipientsApi = {
   create: (data: any) => api.post('/recipients', data),
   update: (id: number, data: any) => api.put(`/recipients/${id}`, data),
   delete: (id: number) => api.delete(`/recipients/${id}`),
+  myConfig: () => api.get('/recipients/my-config'),
+  updateMyConfig: (data: any) => api.put('/recipients/my-config', data),
 };
 
 export const kafkaApi = {

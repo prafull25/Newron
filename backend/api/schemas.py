@@ -41,6 +41,7 @@ class RecipientCreate(BaseModel):
     subscribed_topics: List[str] = []
     receive_breaking: bool = True
     receive_digest: bool = True
+    user_id: Optional[int] = None
 
 
 class RecipientUpdate(BaseModel):
@@ -50,6 +51,7 @@ class RecipientUpdate(BaseModel):
     receive_breaking: Optional[bool] = None
     receive_digest: Optional[bool] = None
     is_active: Optional[bool] = None
+    user_id: Optional[int] = None
 
 
 class RecipientResponse(BaseModel):
@@ -60,6 +62,7 @@ class RecipientResponse(BaseModel):
     receive_breaking: bool
     receive_digest: bool
     is_active: bool
+    user_id: Optional[int] = None
     created_at: Optional[datetime] = None
 
     class Config:
